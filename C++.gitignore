@@ -1,32 +1,59 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+# Игнорирование файлов сборки и бинарников
+bin/
+obj/
 *.exe
-*.out
-*.app
+*.dll
+*.lib
+*.exp
+*.ilk
+*.pdb
+*.ipch
+*.cache
+
+# Файлы пользовательских настроек VS
+*.user
+*.userosscache
+*.sln.docstates
+
+# Файлы VS и временные файлы
+.vs/
+.vscode/
+Debug/
+Release/
+x64/
+x86/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.suo
+*.db
+*.VC.db
+*.VC.VC.opendb
+
+# Файлы CMake (если используется)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+*.cmake
+
+# Резервные копии и временные файлы
+*~
+*.swp
+*.bak
+*.tmp
+
+# Системные файлы
+Thumbs.db
+.DS_Store
+
+# Документация и специфичные файлы
+*.pdf
+*.docx
+*.pptx
+
+# Игнорирование локальных тестовых данных (если есть)
+test_data/
+local_settings.*
