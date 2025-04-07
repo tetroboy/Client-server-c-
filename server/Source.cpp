@@ -4,7 +4,7 @@ using boost::asio::ip::tcp;
 
 // Используем стандартное определение из winternl.h
 
-json handle_command(std::string s);
+json handle_command(std::string s, DWORD processID = 0);
 
 // Функция для получения информации о памяти
 
@@ -127,7 +127,7 @@ void handle_client(tcp::socket socket) {
     }
 }
 
-json handle_command(std::string s) {
+json handle_command(std::string s, DWORD processID = 0) {
     if (s == "CPU usage") {
         return GetCpuUsageJson();
     }
@@ -139,6 +139,27 @@ json handle_command(std::string s) {
     }
     if (s == "PID list") {
         return GetProcessListJson();
+    }
+    if (s.find("kill process") == 0) {
+        // Извлекаем PID из сообщения (формат: "kill process 1234")
+        size_t pos = s.find_last_of(' ');
+        if (pos != std::string::npos) {
+            try {
+                DWORD pid = std::stoul(s.substr(pos + 1));
+                if (KillProcessByID(pid)) {
+                    boost::asio::write(socket, boost::asio::buffer("Process " + std::to_string(pid) + " killed\n"));
+                }
+                else {
+                    boost::asio::write(socket, boost::asio::buffer("Failed to kill process " + std::to_string(pid) + "\n"));
+                }
+            }
+            catch (...) {
+                boost::asio::write(socket, boost::asio::buffer("Invalid PID format\n"));
+            }
+        }
+        else {
+            boost::asio::write(socket, boost::asio::buffer("Usage: kill process <PID>\n"));
+        }
     }
     else return { "Unknown command" };
 }

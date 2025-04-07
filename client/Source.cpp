@@ -30,6 +30,19 @@ int main() {
             case 1: message = "CPU usage\n"; break;
             case 2: message = "RAM usage\n"; break;
             case 3: message = "Disk usage\n"; break;
+            case 4: message = "Processes list\n"; break;
+            case 5: {
+                
+                DWORD PID;
+                if (!(std::cin >> PID)) {
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                    std::cout << "Invalid input. Write PID\n";
+                    continue;
+                }
+                message = "Kill process " + std::to_string(PID) + "\n";
+                break;
+            }
             default:
                 std::cout << "Unknown command\n";
                 continue;
