@@ -1,16 +1,16 @@
 #include "Cpu_info.h"
 #include "Memory_info.h"
+#include "FileSystem.h"
 using boost::asio::ip::tcp;
 
-// Используем стандартное определение из winternl.h
 
-json handle_command(std::string s, DWORD processID = 0);
+json handle_comand(const std::string &s);
 
-// Функция для получения информации о памяти
+
 
 
 json GetProcessListJson() {
-    json processList = json::array(); // Створюємо JSON масив
+    json processList = json::array(); 
 
     HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hProcessSnap == INVALID_HANDLE_VALUE) {
@@ -26,7 +26,7 @@ json GetProcessListJson() {
     }
 
     do {
-        // Конвертуємо ім'я процесу
+        
         std::string processName;
 #ifdef UNICODE
         int size = WideCharToMultiByte(CP_UTF8, 0, pe32.szExeFile, -1, NULL, 0, NULL, NULL);
@@ -40,7 +40,7 @@ json GetProcessListJson() {
         processName = pe32.szExeFile;
 #endif
 
-        // Отримуємо інформацію про пам'ять
+        
         DWORD memoryUsageMB = 0;
         HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe32.th32ProcessID);
         if (hProcess != NULL) {
@@ -51,7 +51,7 @@ json GetProcessListJson() {
             CloseHandle(hProcess);
         }
 
-        // Додаємо інформацію про процес до JSON
+        
         json processInfo = {
             {"pid", pe32.th32ProcessID},
             {"name", processName},
@@ -66,7 +66,7 @@ json GetProcessListJson() {
     } while (Process32Next(hProcessSnap, &pe32));
 
     CloseHandle(hProcessSnap);
-    return { {"processes", processList} }; // Повертаємо об'єкт з масивом процесів
+    return { {"processes", processList} }; 
 }
 
 
@@ -110,9 +110,9 @@ void handle_client(tcp::socket socket) {
 
 
             //handle_command("CPU usage");
-
-            json response = handle_command(message);
-            //json response = GetProcessListJson();
+            ;
+            //json response = handle_comand(message);
+            json response = get_directory_contents("C:/Users/dima/Desktop/laby/diplom");
 
             // Преобразуем JSON в строку и добавляем \n
             std::string response_str = response.dump() + "\n";
@@ -127,12 +127,12 @@ void handle_client(tcp::socket socket) {
     }
 }
 
-json handle_command(std::string s, DWORD processID = 0) {
+json handle_comand(const std::string& s) {
     if (s == "CPU usage") {
         return GetCpuUsageJson();
     }
     if (s == "RAM usage") {
-        return  GetMemoryInfo();
+        return GetMemoryInfo();
     }
     if (s == "Disk usage") {
         return get_disk_info_json();
@@ -141,27 +141,26 @@ json handle_command(std::string s, DWORD processID = 0) {
         return GetProcessListJson();
     }
     if (s.find("kill process") == 0) {
-        // Извлекаем PID из сообщения (формат: "kill process 1234")
         size_t pos = s.find_last_of(' ');
         if (pos != std::string::npos) {
             try {
                 DWORD pid = std::stoul(s.substr(pos + 1));
                 if (KillProcessByID(pid)) {
-                    boost::asio::write(socket, boost::asio::buffer("Process " + std::to_string(pid) + " killed\n"));
+                    return { {"status", "success"}, {"message", "Process " + std::to_string(pid) + " killed"} };
                 }
                 else {
-                    boost::asio::write(socket, boost::asio::buffer("Failed to kill process " + std::to_string(pid) + "\n"));
+                    return { {"status", "error"}, {"message", "Failed to kill process " + std::to_string(pid)} };
                 }
             }
             catch (...) {
-                boost::asio::write(socket, boost::asio::buffer("Invalid PID format\n"));
+                return { {"status", "error"}, {"message", "Invalid PID format"} };
             }
         }
         else {
-            boost::asio::write(socket, boost::asio::buffer("Usage: kill process <PID>\n"));
+            return { {"status", "error"}, {"message", "Usage: kill process <PID>"} };
         }
     }
-    else return { "Unknown command" };
+    return { {"status", "error"}, {"message", "Unknown command"} };
 }
 
 int main() {

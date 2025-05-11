@@ -7,8 +7,6 @@ int main() {
     try {
         boost::asio::io_context io_context;
         tcp::socket socket(io_context);
-
-        // Устанавливаем соединение один раз
         socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 1234));
         std::cout << "Connected to server. Type commands (1-CPU, 2-RAM, 3-Disk, 0-Exit)\n";
 
@@ -49,10 +47,10 @@ int main() {
             }
 
             try {
-                // Отправка запроса
+                
                 boost::asio::write(socket, boost::asio::buffer(message));
 
-                // Чтение ответа
+                
                 boost::asio::streambuf response;
                 boost::asio::read_until(socket, response, '\n');
 
@@ -65,12 +63,12 @@ int main() {
             catch (const boost::system::system_error& e) {
                 if (e.code() == boost::asio::error::eof) {
                     std::cerr << "Server closed connection. Reconnecting...\n";
-                    // Переподключение
+                    
                     socket.close();
                     socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 1234));
                 }
                 else {
-                    throw; // Перебрасываем другие ошибки
+                    throw; 
                 }
             }
         }

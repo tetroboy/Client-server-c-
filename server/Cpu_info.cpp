@@ -4,7 +4,7 @@ static std::vector<SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION> prevCoreInfo;
 static ULONGLONG prevTotalIdle = 0, prevTotalKernel = 0, prevTotalUser = 0;
 static int coreCount = 0;
 
-// Инициализация мониторинга
+
 bool InitCpuMonitor() {
     SYSTEM_INFO sysInfo;
     GetSystemInfo(&sysInfo);
@@ -19,7 +19,7 @@ bool InitCpuMonitor() {
         nullptr
     );
 
-    // Считаем начальные суммарные значения
+    
     for (const auto& core : prevCoreInfo) {
         prevTotalIdle += core.IdleTime.QuadPart;
         prevTotalKernel += core.KernelTime.QuadPart;
@@ -29,7 +29,7 @@ bool InitCpuMonitor() {
     return NT_SUCCESS(status);
 }
 
-// Получение данных по всем ядрам
+
 std::vector<double> GetCoreUsages() {
     std::vector<SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION> currentInfo(coreCount);
     ULONG bufferSize = coreCount * sizeof(SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION);
@@ -56,7 +56,7 @@ std::vector<double> GetCoreUsages() {
     return usages;
 }
 
-// Получение общей загрузки CPU
+
 double GetTotalCpuUsage() {
     ULONGLONG totalIdle = 0, totalKernel = 0, totalUser = 0;
 
@@ -82,27 +82,25 @@ json GetCpuUsageJson() {
     std::vector<double> coreUsages;
     double totalUsage;
 
-    // Делаем 2 замера с интервалом для точности
+    
     for (int i = 0; i < 2; ++i) {
         Sleep(100);
         coreUsages = GetCoreUsages();
         totalUsage = GetTotalCpuUsage();
     }
 
-    // Создаем JSON структуру
+    
     json cpuInfo;
-
-    // Добавляем информацию по ядрам
     json coresArray = json::array();
     for (size_t i = 0; i < coreUsages.size(); i++) {
         json coreInfo = {
             {"core_id", i},
-            {"usage_percent", std::round(coreUsages[i] * 10) / 10} // Округляем до 1 знака
+            {"usage_percent", std::round(coreUsages[i] * 10) / 10} 
         };
         coresArray.push_back(coreInfo);
     }
 
-    // Добавляем общую информацию
+
     cpuInfo["cores"] = coresArray;
     cpuInfo["total_usage"] = std::round(totalUsage * 10) / 10;
     cpuInfo["core_count"] = coreUsages.size();

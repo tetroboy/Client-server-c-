@@ -3,21 +3,20 @@
 json GetMemoryInfo() {
     MEMORYSTATUSEX memInfo;
     memInfo.dwLength = sizeof(memInfo);
-    json RAM_info = json::array();  // Создаем JSON массив
+    json RAM_info = json::array();  
     if (GlobalMemoryStatusEx(&memInfo)) {
-        // Общий объем памяти
+        
         DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
-        // Доступная память
+       
         DWORDLONG freePhysMem = memInfo.ullAvailPhys;
-        // Используемая память
+       
         DWORDLONG usedPhysMem = totalPhysMem - freePhysMem;
 
-        // Переводим в мегабайты
+       
         double totalMB = totalPhysMem / (1024.0 * 1024.0);
         double usedMB = usedPhysMem / (1024.0 * 1024.0);
         double freeMB = freePhysMem / (1024.0 * 1024.0);
 
-        // Процент использования
         double usagePercent = (usedPhysMem * 100.0) / totalPhysMem;
         json Ram = {
                     {"Total RAM:",totalMB, " MB"},
@@ -38,7 +37,7 @@ json GetMemoryInfo() {
 }
 
 json get_disk_info_json() {
-    json disk_info = json::array();  // Создаем JSON массив
+    json disk_info = json::array();  
 
     DWORD drives = GetLogicalDrives();
     char drive_letter = 'A';
@@ -60,5 +59,5 @@ json get_disk_info_json() {
         }
     }
 
-    return { {"disks", disk_info} };  // Возвращаем объект с массивом дисков
+    return { {"disks", disk_info} };  
 }
