@@ -1,9 +1,13 @@
+# Дозволяємо Openssl та його вміст
+!Openssl/
+!Openssl/*
+packages/
+
 # Игнорирование файлов сборки и бинарников
 bin/
 obj/
 *.exe
-*.dll
-*.lib
+
 *.exp
 *.ilk
 *.pdb

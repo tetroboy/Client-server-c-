@@ -1,0 +1,14 @@
+Tue Jun 17 11:07:46 2025 - Server started. Session password: cjByMlG9laRjj7mz
+Tue Jun 17 11:07:51 2025 - Connected new user
+Tue Jun 17 11:12:27 2025 - Server started. Session password: wVI**WwZ2G7BfUG4
+Tue Jun 17 11:12:38 2025 - Connected new user
+Tue Jun 17 11:12:46 2025 - Client authorized successfully
+Tue Jun 17 11:12:46 2025 - Sent token: INcNFQv%haKvDv0jt6c^Tm9et7%YU1zT
+Tue Jun 17 11:13:06 2025 - Received message: RAM usage token:035362847bcef517b9ac238223d0efe9bae698c075733db665c8faf809ccdd17
+Tue Jun 17 11:13:06 2025 - Sent response: {"RAM info":[[["Total RAM:",32710.89453125," MB"],["Used RAM:",16377.18359375," MB"],["Free RAM:",16333.7109375," MB"]]]}
+
+Tue Jun 17 11:13:20 2025 - Received message: Disk usage token:f1fa05f543ff846ee12be0df68f6c52790ebf6cfe811df0c229844ca6a630d30
+Tue Jun 17 11:13:20 2025 - Sent response: {"disks":[{"drive":"C:\\","free_gb":23.233631134033203,"total_gb":465.16112899780273,"used_gb":441.92749786376953},{"drive":"D:\\","free_gb":46.73027801513672,"total_gb":950.8740005493164,"used_gb":904.1437225341797}]}
+
+Tue Jun 17 11:13:27 2025 - Error: read_until: An existing connection was forcibly closed by the remote host [system:10054]
+Tue Jun 17 11:15:50 2025 - Server started. Session password: *8F&u#E^6&bbSVVz
