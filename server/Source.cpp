@@ -247,10 +247,10 @@ json handle_comand(const std::string& s) {
         return GetCpuUsageJson();
     }
     if (s == "RAM usage") {
-        return GetMemoryInfo();
+        return MemoryInfoManager::get_memory_info();
     }
     if (s == "Disk usage") {
-        return get_disk_info_json();
+        return MemoryInfoManager::get_disk_info();
     }
     if (s == "PID list") {
         return GetProcessListJson();
@@ -280,7 +280,7 @@ json handle_comand(const std::string& s) {
         if (pos != std::string::npos) {
             std::string path = s.substr(pos + 1);
             std::cout << "path input " << path;
-            return read_file(path);
+            return FileSystemManager::read_file(path);
         }
         else {
             return { {"status", "error"}, {"message", "Usage: Read_file <path>"} };
@@ -292,7 +292,7 @@ json handle_comand(const std::string& s) {
         if (pos != std::string::npos) {
             std::string path = s.substr(pos + 1);
             std::cout << "path input " << path;
-            return get_directory_contents(path);
+            return FileSystemManager::get_directory_contents(path);
         }
         else {
             return { {"status", "error"}, {"message", "Usage: Read_file <path>"} };
@@ -304,7 +304,7 @@ json handle_comand(const std::string& s) {
         if (pos != std::string::npos) {
             std::string path = s.substr(pos + 1);
             std::cout << "path input " << path;
-            return delete_path(path);
+            return FileSystemManager::delete_path(path);
         }
         else {
             return { {"status", "error"}, {"message", "Usage: Read_file <path>"} };

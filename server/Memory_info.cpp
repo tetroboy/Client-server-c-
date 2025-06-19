@@ -1,48 +1,42 @@
-#include "Memory_info.h"
+﻿#include "Memory_info.h"
+json MemoryInfoManager::get_memory_info() {
+    MEMORYSTATUSEX mem_info;
+    mem_info.dwLength = sizeof(mem_info);
+    json ram_info = json::array();
 
-json GetMemoryInfo() {
-    MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(memInfo);
-    json RAM_info = json::array();  
-    if (GlobalMemoryStatusEx(&memInfo)) {
-        
-        DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
-       
-        DWORDLONG freePhysMem = memInfo.ullAvailPhys;
-       
-        DWORDLONG usedPhysMem = totalPhysMem - freePhysMem;
+    if (GlobalMemoryStatusEx(&mem_info)) {
+        ULARGE_INTEGER total_phys_mem = { mem_info.ullTotalPhys };
+        ULARGE_INTEGER free_phys_mem = { mem_info.ullAvailPhys };
+        ULARGE_INTEGER used_phys_mem = { total_phys_mem.QuadPart - free_phys_mem.QuadPart };
 
-       
-        double totalMB = totalPhysMem / (1024.0 * 1024.0);
-        double usedMB = usedPhysMem / (1024.0 * 1024.0);
-        double freeMB = freePhysMem / (1024.0 * 1024.0);
+        double total_mb = MemoryInfoManager::bytes_to_gb(total_phys_mem) * 1024;
+        double used_mb = MemoryInfoManager::bytes_to_gb(used_phys_mem) * 1024;
+        double free_mb = MemoryInfoManager::bytes_to_gb(free_phys_mem) * 1024;
 
-        double usagePercent = (usedPhysMem * 100.0) / totalPhysMem;
-        json Ram = {
-                    {"Total RAM:",totalMB, " MB"},
-                    {"Used RAM:", usedMB, " MB"},
-                    {"Free RAM:", freeMB, " MB"}
+        double usage_percent = (static_cast<double>(used_phys_mem.QuadPart) * 100.0) / total_phys_mem.QuadPart;
+
+        json ram = {
+            {"total_ram", total_mb},
+            {"used_ram", used_mb},
+            {"free_ram", free_mb},
+            {"usage_percent", usage_percent}
         };
-        RAM_info.push_back(Ram);
-        /*std::cout << "=== Memory Usage ===" << std::endl;
-        std::cout << "Total RAM: " << std::fixed << std::setprecision(2) << totalMB << " MB" << std::endl;
-        std::cout << "Used RAM: " << std::fixed << std::setprecision(2) << usedMB << " MB ("
-            << std::setprecision(1) << usagePercent << "%)" << std::endl;
-        std::cout << "Free RAM: " << std::fixed << std::setprecision(2) << freeMB << " MB" << std::endl;*/
+        ram_info.push_back(ram);
     }
     else {
         std::cerr << "Failed to get memory info!" << std::endl;
     }
-    return { {"RAM info", RAM_info} };
+    return { {"ram_info", ram_info} };
 }
 
-json get_disk_info_json() {
-    json disk_info = json::array();  
+json MemoryInfoManager::get_disk_info() {
+    json disk_info = json::array();
+    const int MAX_DRIVE_COUNT = 26; 
 
     DWORD drives = GetLogicalDrives();
     char drive_letter = 'A';
 
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < MAX_DRIVE_COUNT; ++i) {
         if (drives & (1 << i)) {
             std::string root_path = std::string(1, drive_letter + i) + ":\\";
             ULARGE_INTEGER free_bytes, total_bytes, total_free_bytes;
@@ -50,14 +44,14 @@ json get_disk_info_json() {
             if (GetDiskFreeSpaceExA(root_path.c_str(), &free_bytes, &total_bytes, &total_free_bytes)) {
                 json disk = {
                     {"drive", root_path},
-                    {"total_gb", static_cast<double>(total_bytes.QuadPart) / (1024 * 1024 * 1024)},
-                    {"free_gb", static_cast<double>(free_bytes.QuadPart) / (1024 * 1024 * 1024)},
-                    {"used_gb", static_cast<double>(total_bytes.QuadPart - free_bytes.QuadPart) / (1024 * 1024 * 1024)}
+                    {"total_gb", MemoryInfoManager::bytes_to_gb(total_bytes)},
+                    {"free_gb", MemoryInfoManager::bytes_to_gb(free_bytes)},
+                    {"used_gb", MemoryInfoManager::bytes_to_gb(total_bytes) - MemoryInfoManager::bytes_to_gb(free_bytes)}
                 };
                 disk_info.push_back(disk);
             }
         }
     }
 
-    return { {"disks", disk_info} };  
+    return { {"disks", disk_info} };
 }
