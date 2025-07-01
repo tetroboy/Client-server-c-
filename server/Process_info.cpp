@@ -1,101 +1,91 @@
 #include "Process_info.h"
 
-json GetProcessListJson() {
-    json processList = json::array();
+json ProcessManager::get_process_list() {
+    json process_list = json::array();
 
-    HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (hProcessSnap == INVALID_HANDLE_VALUE) {
-        throw std::runtime_error("Error creating process snapshot (Error: " + std::to_string(GetLastError()) + ")");
+    HANDLE h_process_snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (h_process_snap == INVALID_HANDLE_VALUE) {
+        throw std::runtime_error("Error creating process snapshot (Error: " +
+            std::to_string(GetLastError()) + ")");
     }
 
     PROCESSENTRY32 pe32;
     pe32.dwSize = sizeof(PROCESSENTRY32);
 
-    if (!Process32First(hProcessSnap, &pe32)) {
-        CloseHandle(hProcessSnap);
-        throw std::runtime_error("Error getting process info (Error: " + std::to_string(GetLastError()) + ")");
+    if (!Process32First(h_process_snap, &pe32)) {
+        CloseHandle(h_process_snap);
+        throw std::runtime_error("Error getting process info (Error: " +
+            std::to_string(GetLastError()) + ")");
     }
 
     do {
-
-        std::string processName;
+        std::string process_name;
 #ifdef UNICODE
-        int size = WideCharToMultiByte(CP_UTF8, 0, pe32.szExeFile, -1, NULL, 0, NULL, NULL);
+        int size = WideCharToMultiByte(CP_UTF8, 0, pe32.szExeFile, -1, nullptr, 0, nullptr, nullptr);
         if (size > 0) {
             char* buffer = new char[size];
-            WideCharToMultiByte(CP_UTF8, 0, pe32.szExeFile, -1, buffer, size, NULL, NULL);
-            processName = buffer;
+            WideCharToMultiByte(CP_UTF8, 0, pe32.szExeFile, -1, buffer, size, nullptr, nullptr);
+            process_name = buffer;
             delete[] buffer;
         }
 #else
-        processName = pe32.szExeFile;
+        process_name = pe32.szExeFile;
 #endif
 
-
-        DWORD memoryUsageMB = 0;
-        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe32.th32ProcessID);
-        if (hProcess != NULL) {
+        DWORD memory_usage_mb = 0;
+        HANDLE h_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe32.th32ProcessID);
+        if (h_process != nullptr) {
             PROCESS_MEMORY_COUNTERS pmc;
-            if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
-                memoryUsageMB = pmc.WorkingSetSize / (1024 * 1024);
+            if (GetProcessMemoryInfo(h_process, &pmc, sizeof(pmc))) {
+                memory_usage_mb = pmc.WorkingSetSize / (1024 * 1024);
             }
-            CloseHandle(hProcess);
+            CloseHandle(h_process);
         }
 
-
-        json processInfo = {
+        json process_info = {
             {"pid", pe32.th32ProcessID},
-            {"name", processName},
+            {"name", process_name},
             {"parent_pid", pe32.th32ParentProcessID},
             {"threads", pe32.cntThreads},
             {"priority", pe32.pcPriClassBase},
-            {"memory_mb", memoryUsageMB}
+            {"memory_mb", memory_usage_mb}
         };
 
-        processList.push_back(processInfo);
+        process_list.push_back(process_info);
+    } while (Process32Next(h_process_snap, &pe32));
 
-    } while (Process32Next(hProcessSnap, &pe32));
-
-    CloseHandle(hProcessSnap);
-    return { {"processes", processList} };
+    CloseHandle(h_process_snap);
+    return { {"processes", process_list} };
 }
 
-json start_process(const std::string& program_path) {
+json ProcessManager::start_process(const std::string& program_path) {
     json result;
     result["status"] = "success";
     result["message"] = "Process start attempt";
 
-    HINSTANCE hInstance = ShellExecuteA(
-        NULL,
-        "open",
-        program_path.c_str(),
-        NULL,
-        NULL,
-        SW_SHOW
-    );
+    HINSTANCE h_instance = ShellExecuteA(
+        nullptr, "open", program_path.c_str(), nullptr, nullptr, SW_SHOW);
 
-    if ((INT_PTR)hInstance > 32) {
-        std::string full_message = "Process start attempt - File opened successfully";
-        result["message"] = full_message;
+    if ((INT_PTR)h_instance > 32) {
+        result["message"] = "Process start attempt - File opened successfully";
     }
     else {
-        std::string error_message = "Process start attempt - Failed to open file (Error: " +
-            std::to_string((int)(INT_PTR)hInstance) + ")";
-        result["message"] = error_message;
+        result["message"] = "Process start attempt - Failed to open file (Error: " +
+            std::to_string((int)(INT_PTR)h_instance) + ")";
     }
 
     return result;
 }
 
-bool KillProcessByID(DWORD processID) {
-    HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, processID);
-    if (hProcess == NULL) {
+bool ProcessManager::kill_process_by_id(DWORD process_id) {
+    HANDLE h_process = OpenProcess(PROCESS_TERMINATE, FALSE, process_id);
+    if (h_process == nullptr) {
         std::cerr << "Unable to open process (Error: " << GetLastError() << ")" << std::endl;
         return false;
     }
 
-    bool result = TerminateProcess(hProcess, 1);
-    CloseHandle(hProcess);
+    bool result = TerminateProcess(h_process, 1);
+    CloseHandle(h_process);
 
     if (!result) {
         std::cerr << "Unable to kill process (Error: " << GetLastError() << ")" << std::endl;

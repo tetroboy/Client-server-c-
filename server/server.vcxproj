@@ -155,20 +155,28 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientHandler.cpp" />
+    <ClCompile Include="CommandHandler.cpp" />
     <ClCompile Include="Cpu_info.cpp" />
     <ClCompile Include="FileSystem.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Memory_info.cpp" />
     <ClCompile Include="NetConnection_info.cpp" />
     <ClCompile Include="Process_info.cpp" />
+    <ClCompile Include="SecurityManager.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClientHandler.h" />
+    <ClInclude Include="CommandHandler.h" />
     <ClInclude Include="Cpu_info.h" />
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="Libs.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="Memory_info.h" />
     <ClInclude Include="NetConnection.h" />
     <ClInclude Include="Process_info.h" />
+    <ClInclude Include="SecurityManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

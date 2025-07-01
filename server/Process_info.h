@@ -1,6 +1,9 @@
 #pragma once
 #include "libs.h"
-json GetProcessListJson();
-bool KillProcessByID(DWORD processID);
-json start_process(const std::string& program_path);
 
+class ProcessManager {
+public:
+    static json get_process_list();
+    static json start_process(const std::string& program_path);
+    static bool kill_process_by_id(DWORD process_id);
+};

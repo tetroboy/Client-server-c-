@@ -33,6 +33,18 @@
     <ClCompile Include="NetConnection_info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SecurityManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cpu_info.h">
@@ -51,6 +63,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetConnection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SecurityManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
