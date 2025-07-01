@@ -61,3 +61,4 @@ Thumbs.db
 # Игнорирование локальных тестовых данных (если есть)
 test_data/
 local_settings.*
+/packages
