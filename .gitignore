@@ -62,3 +62,4 @@ Thumbs.db
 test_data/
 local_settings.*
 /packages
+/server/*.txt
