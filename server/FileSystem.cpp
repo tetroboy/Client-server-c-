@@ -133,7 +133,7 @@ json FileSystemManager::read_file(const std::string& path_str) {
         if (fs::is_regular_file(path_to_read)) {
             std::ifstream file(path_to_read);
             if (!file.is_open()) {
-                std::cerr << "Ошибка открытия файла!" << std::endl;
+                std::cerr << "Error openning file" << std::endl;
                 return 1;
             }
 
@@ -144,7 +144,7 @@ json FileSystemManager::read_file(const std::string& path_str) {
             }
             if (file.bad()) {
                 result["status"] = "error";
-                result["message"] = "Ошибка чтения файла!";
+                result["message"] = "Error reading file";
                 return result;
             }
             file.close();
